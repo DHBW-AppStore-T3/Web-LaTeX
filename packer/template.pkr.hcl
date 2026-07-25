@@ -14,7 +14,7 @@ locals {
   flavor            = "gp1.small"
   ssh_username      = "ubuntu"
   ssh_timeout       = "20m"
-  # Kein Blockstorage-Volume — reduziert OpenStack-Ressourcenverbrauch
+  # No block storage volume — reduces OpenStack resource consumption
   use_blockstorage_volume = false
   volume_size             = 10
   use_floating_ip         = false

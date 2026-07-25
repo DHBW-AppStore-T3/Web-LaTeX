@@ -29,7 +29,7 @@ echo "[3/6] Creating Flask app..."
 sudo mkdir -p /opt/weblatex/templates
 sudo mkdir -p /var/www/weblatex
 
-# Demo-Projekt als ZIP im Image ablegen
+# Bundle demo project as ZIP into the image
 DEMO_TMP=$(mktemp -d)
 mkdir -p "$DEMO_TMP/chapters"
 
@@ -87,7 +87,7 @@ from flask import Flask, request, jsonify, send_file, render_template, session, 
 
 app = Flask(__name__)
 
-# Persistent secret key — kein Session-Verlust bei Service-Restart
+# Persistent secret key — prevents session invalidation on service restart
 _secret_path = '/etc/weblatex/flask_secret'
 if os.path.exists(_secret_path):
     with open(_secret_path, 'rb') as _f:
@@ -231,7 +231,7 @@ def new_file():
         return jsonify({'error': 'Name fehlt'}), 400
     if not name.endswith('.tex'):
         name += '.tex'
-    # Sicherheitsprüfung: kein Path-Traversal
+    # Security check: prevent path traversal
     user_dir = get_user_dir(session['username'])
     full = os.path.realpath(os.path.join(user_dir, name))
     if not full.startswith(os.path.realpath(user_dir)):
@@ -457,7 +457,7 @@ sudo tee /opt/weblatex/templates/index.html > /dev/null << 'HTMLEOF'
                  overflow-y: auto; max-height: 180px; }
     .error-box pre { white-space: pre-wrap; }
 
-    /* ── Modal: Neue Datei ── */
+    /* ── Modal: New File ── */
     .modal-backdrop { display: none; position: fixed; inset: 0;
                       background: rgba(0,0,0,.7); z-index: 100;
                       align-items: center; justify-content: center; }
@@ -515,7 +515,7 @@ sudo tee /opt/weblatex/templates/index.html > /dev/null << 'HTMLEOF'
     </div>
   </main>
 
-  <!-- Modal: Neue Datei -->
+  <!-- Modal: New File -->
   <div class="modal-backdrop" id="newFileModal" onclick="if(event.target===this)closeNewFileModal()">
     <div class="modal">
       <h2>Neue .tex-Datei erstellen</h2>
@@ -528,7 +528,7 @@ sudo tee /opt/weblatex/templates/index.html > /dev/null << 'HTMLEOF'
     </div>
   </div>
 
-  <!-- Lightbox: Bild anzeigen -->
+  <!-- Lightbox: Show image -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <img id="lightboxImg" src="" alt="">
   </div>
@@ -662,7 +662,7 @@ sudo tee /opt/weblatex/templates/index.html > /dev/null << 'HTMLEOF'
     }
 
     async function compile() {
-      // Aktuelle Datei speichern — alle anderen wurden beim Tippen bereits auto-gespeichert
+      // Save current file — all others were already auto-saved on keystroke
       await saveCurrentFile();
       const btn = document.getElementById('compileBtn');
       const errorBox = document.getElementById('errorBox');
@@ -688,7 +688,7 @@ sudo tee /opt/weblatex/templates/index.html > /dev/null << 'HTMLEOF'
       }
     }
 
-    // Auto-save beim Tippen (500ms debounce)
+    // Auto-save on keystroke (500ms debounce)
     let saveTimer = null;
     editor.on('change', () => {
       clearTimeout(saveTimer);

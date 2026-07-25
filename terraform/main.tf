@@ -57,7 +57,7 @@ locals {
   teams_list = distinct([for user in local.all_users : user.team])
 }
 
-# Ein Passwort pro individuellem User
+# One password per individual user
 resource "random_password" "user_passwords" {
   for_each    = local.users_map
   length      = 16

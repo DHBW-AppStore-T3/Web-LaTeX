@@ -37,14 +37,14 @@ write_files:
       chown www-data:www-data "$BASE_DIR"
       chmod 755 "$BASE_DIR"
 
-      # ── 1. Flask secret_key persistent erzeugen ──────────────────────────────
+      # ── 1. Generate persistent Flask secret_key ─────────────────────────────
       if [ ! -f /etc/weblatex/flask_secret ]; then
           python3 -c "import os; open('/etc/weblatex/flask_secret','wb').write(os.urandom(32))"
           chown root:www-data /etc/weblatex/flask_secret
           chmod 640 /etc/weblatex/flask_secret
       fi
 
-      # ── 2. Pro User Verzeichnis + Startdokumente anlegen ─────────────────────
+      # ── 2. Create per-user directory and seed initial documents ─────────────
       for envfile in /etc/weblatex/users/*.env; do
           [ -f "$envfile" ] || continue
 
@@ -60,12 +60,11 @@ write_files:
           UDIR="$BASE_DIR/$UNAME"
           mkdir -p "$UDIR"
 
-          # assignment_files verarbeiten
+          # process assignment_files
           if [ -d /tmp/assignment ] && [ "$(ls -A /tmp/assignment 2>/dev/null)" ]; then
               for srcfile in /tmp/assignment/*; do
                   fname=$(basename "$srcfile")
                   if echo "$fname" | grep -qi '\.zip$'; then
-                      # ZIP entpacken
                       unzip -o "$srcfile" -d "$UDIR" > /tmp/unzip_"$UNAME".log 2>&1 || \
                           echo "$LOG WARNING: unzip failed for $fname"
                   else
@@ -74,7 +73,7 @@ write_files:
               done
           fi
 
-          # assignment_files leer → Demo-ZIP aus dem Image entpacken
+          # no assignment_files provided — fall back to demo ZIP bundled in the image
           if [ ! -f "$UDIR/master.tex" ]; then
               unzip -o /opt/weblatex/demo_project.zip -d "$UDIR" > /tmp/unzip_demo_"$UNAME".log 2>&1 || \
                   echo "$LOG WARNING: demo unzip failed for $UNAME"
@@ -82,7 +81,7 @@ write_files:
 
           chown -R www-data:www-data "$UDIR"
 
-          # Vorab-Kompilierung (zweimal für TOC/Referenzen)
+          # pre-compile twice to resolve TOC/cross-references
           pdflatex -interaction=nonstopmode -output-directory="$UDIR" "$UDIR/master.tex" \
               > /tmp/pdflatex_"$UNAME"_1.log 2>&1 || true
           pdflatex -interaction=nonstopmode -output-directory="$UDIR" "$UDIR/master.tex" \
@@ -91,10 +90,9 @@ write_files:
           chown -R www-data:www-data "$UDIR"
       done
 
-      # Aufräumen
       rm -rf /tmp/assignment
 
-      # ── 1. Services starten ───────────────────────────────────────────────────
+      # ── 1. Start services ────────────────────────────────────────────────────
       echo "$LOG STEP 1: Starting services..."
       systemctl start weblatex
       systemctl enable weblatex
@@ -104,7 +102,7 @@ write_files:
           sleep 2
       done
 
-      # nginx nur laden (kein restart — restart zerstört Flask-Sessions nicht, aber reload reicht)
+      # reload nginx, not restart — restart would not destroy Flask sessions but reload is sufficient
       systemctl reload nginx || systemctl start nginx
 
       HTTP_CODE=$(curl -s -o /dev/null -w "%%{http_code}" http://localhost/ || echo "000")
