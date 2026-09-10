@@ -136,14 +136,14 @@ resource "openstack_networking_floatingip_associate_v2" "team_fip_assoc" {
 locals {
   # Prefer IPv6 when no floating IP — IPv4 (10.200.x.x) is only reachable
   # inside OpenStack; IPv6 is publicly routable on DHBWV6.
-  # fixed_ip_v6 is assigned by OpenStack at port-create time on DHBWV6.
+  # access_ip_v6 is populated by Nova after the VM boots on a dual-stack network.
   team_ip = {
     for team in local.teams_list : team => (
       local.enable_floating_ip
         ? openstack_networking_floatingip_v2.team_fip[team].address
         : coalesce(
-            openstack_networking_port_v2.team_port[team].fixed_ip_v6,
-            openstack_networking_port_v2.team_port[team].all_fixed_ips[0]
+            openstack_compute_instance_v2.team_vm[team].access_ip_v6,
+            openstack_compute_instance_v2.team_vm[team].access_ip_v4
           )
     )
   }
