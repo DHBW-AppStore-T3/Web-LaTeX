@@ -130,32 +130,20 @@ resource "openstack_networking_floatingip_associate_v2" "team_fip_assoc" {
 }
 
 ############################
-# PORT LOOKUP (IPv6 extraction)
-############################
-
-# Read back the port after VM creation to get all assigned IPs including IPv6.
-# The resource's all_fixed_ips only contains IPv4 at apply time on DHBWV6;
-# the data source re-reads the port from Neutron and has the full list.
-data "openstack_networking_port_v2" "team_port_lookup" {
-  for_each   = toset(local.teams_list)
-  port_id    = openstack_networking_port_v2.team_port[each.key].id
-  depends_on = [openstack_compute_instance_v2.team_vm]
-}
-
-############################
 # OUTPUT CONTRACT
 ############################
 
 locals {
   # Prefer IPv6 — IPv4 (10.200.x.x) is only reachable inside OpenStack;
   # IPv6 is publicly routable on DHBWV6.
+  # network[0].fixed_ip_v6 is set by Nova after the VM boots (SLAAC).
   team_ip = {
     for team in local.teams_list : team => (
       local.enable_floating_ip
         ? openstack_networking_floatingip_v2.team_fip[team].address
         : coalesce(
-            try([for ip in data.openstack_networking_port_v2.team_port_lookup[team].all_fixed_ips : ip if can(regex(":", ip))][0], ""),
-            data.openstack_networking_port_v2.team_port_lookup[team].all_fixed_ips[0]
+            openstack_compute_instance_v2.team_vm[team].network[0].fixed_ip_v6,
+            openstack_compute_instance_v2.team_vm[team].network[0].fixed_ip_v4
           )
     )
   }
