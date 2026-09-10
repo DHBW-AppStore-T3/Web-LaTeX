@@ -730,6 +730,7 @@ echo "[6/6] Configuring nginx as reverse proxy..."
 sudo tee /etc/nginx/sites-available/weblatex > /dev/null << 'NGINXEOF'
 server {
     listen 80 default_server;
+    listen [::]:80;
     server_name _;
 
     location / {
