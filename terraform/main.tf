@@ -24,7 +24,7 @@ provider "openstack" {
 locals {
   app_name           = "web-latex"
   flavor             = "gp1.small"
-  enable_floating_ip = true
+  enable_floating_ip = var.enable_floating_ip
   key_pair           = ""
 }
 
@@ -34,7 +34,8 @@ data "openstack_images_image_v2" "image" {
 }
 
 data "openstack_networking_network_v2" "external" {
-  name = var.floating_ip_pool
+  count = local.enable_floating_ip ? 1 : 0
+  name  = var.floating_ip_pool
 }
 
 ############################
@@ -116,7 +117,7 @@ resource "openstack_compute_instance_v2" "team_vm" {
 
 resource "openstack_networking_floatingip_v2" "team_fip" {
   for_each = local.enable_floating_ip ? toset(local.teams_list) : toset([])
-  pool     = data.openstack_networking_network_v2.external.name
+  pool     = data.openstack_networking_network_v2.external[0].name
 }
 
 resource "openstack_networking_floatingip_associate_v2" "team_fip_assoc" {
