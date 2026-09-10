@@ -39,8 +39,14 @@ variable "network_uuid" {
   type        = string
 }
 
+variable "enable_floating_ip" {
+  description = "Floating IP aktivieren — nur wenn das interne Netz per Router mit einem External Network verbunden ist. Im DHBWV6-Netz nicht nötig (VMs bekommen direkt IPv6). @platform:bool"
+  type        = bool
+  default     = false
+}
+
 variable "floating_ip_pool" {
-  description = "Name des External Networks für Floating IPs @openstack:floating_ip_pool:name"
+  description = "Name des External Networks für Floating IPs (nur relevant wenn enable_floating_ip=true) @openstack:floating_ip_pool:name"
   type        = string
   default     = "DHBW"
 }
