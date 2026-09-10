@@ -10,7 +10,7 @@ packer {
 locals {
   cloud             = "openstack"
   provision_script  = "scripts/provision.sh"
-  source_image_name = "Ubuntu 22.04"
+  source_image_name = "Ubuntu 24.04"
   flavor            = "gp1.small"
   ssh_username      = "ubuntu"
   ssh_timeout       = "20m"
