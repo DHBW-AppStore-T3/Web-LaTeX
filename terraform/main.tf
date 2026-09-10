@@ -136,12 +136,13 @@ resource "openstack_networking_floatingip_associate_v2" "team_fip_assoc" {
 locals {
   # Prefer IPv6 when no floating IP — IPv4 (10.200.x.x) is only reachable
   # inside OpenStack; IPv6 is publicly routable on DHBWV6.
+  # fixed_ip_v6 is assigned by OpenStack at port-create time on DHBWV6.
   team_ip = {
     for team in local.teams_list : team => (
       local.enable_floating_ip
         ? openstack_networking_floatingip_v2.team_fip[team].address
-        : try(
-            [for ip in openstack_networking_port_v2.team_port[team].all_fixed_ips : ip if can(regex(":", ip))][0],
+        : coalesce(
+            openstack_networking_port_v2.team_port[team].fixed_ip_v6,
             openstack_networking_port_v2.team_port[team].all_fixed_ips[0]
           )
     )
