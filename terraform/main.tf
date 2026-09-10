@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.5"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
@@ -130,20 +134,35 @@ resource "openstack_networking_floatingip_associate_v2" "team_fip_assoc" {
 }
 
 ############################
+# WAIT FOR SLAAC (IPv6)
+############################
+
+# SLAAC assigns IPv6 after the VM boots and responds to Router Advertisements.
+# Wait 30s so Nova has time to record the IPv6 on the instance before we read it.
+resource "time_sleep" "wait_for_ipv6" {
+  for_each        = local.enable_floating_ip ? toset([]) : toset(local.teams_list)
+  create_duration = "30s"
+  depends_on      = [openstack_compute_instance_v2.team_vm]
+}
+
+data "openstack_compute_instance_v2" "team_vm_refreshed" {
+  for_each = local.enable_floating_ip ? toset([]) : toset(local.teams_list)
+  id       = openstack_compute_instance_v2.team_vm[each.key].id
+  depends_on = [time_sleep.wait_for_ipv6]
+}
+
+############################
 # OUTPUT CONTRACT
 ############################
 
 locals {
-  # Prefer IPv6 — IPv4 (10.200.x.x) is only reachable inside OpenStack;
-  # IPv6 is publicly routable on DHBWV6.
-  # network[0].fixed_ip_v6 is set by Nova after the VM boots (SLAAC).
   team_ip = {
     for team in local.teams_list : team => (
       local.enable_floating_ip
         ? openstack_networking_floatingip_v2.team_fip[team].address
         : coalesce(
-            openstack_compute_instance_v2.team_vm[team].network[0].fixed_ip_v6,
-            openstack_compute_instance_v2.team_vm[team].network[0].fixed_ip_v4
+            data.openstack_compute_instance_v2.team_vm_refreshed[team].access_ip_v6,
+            data.openstack_compute_instance_v2.team_vm_refreshed[team].access_ip_v4
           )
     )
   }
