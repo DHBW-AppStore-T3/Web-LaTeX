@@ -79,3 +79,21 @@ eine `master.tex` im Root enthalten.
 - Kompilierung via `pdflatex` (zweifacher Lauf für TOC/Referenzen)
 
  
+
+## Pod-Variante (ab v2.0.0)
+
+Ab Version `v2.0.0` läuft Web-LaTeX als Pods statt als VMs (`appstore.yaml`, App-Vertrag v2):
+**ein Editor-Pod je Person** mit eigenem Speicher (2 GiB), HTTPS-Link und eigenem Passwort
+unter „Meine Zugänge“. Keine VM, kein Packer-Build, kein OpenStack-Credential.
+
+- **Login:** Benutzername und Passwort stehen unter „Meine Zugänge“ (der Benutzername ist
+  nicht mehr die E-Mail-Adresse, sondern der Plattform-Benutzername).
+- **Startprojekt:** Die optionale ZIP-Variable `starter` (ein Startprojekt pro Team, `master.tex`
+  im Root, max. 1 MiB) wird beim ersten Öffnen im persönlichen Workspace entpackt. Ohne ZIP
+  startet der Editor mit dem mitgelieferten Demo-Projekt (`image/demo/`).
+- **App-Code:** Die Flask-App und die Templates liegen jetzt unter `image/app/` (früher als
+  Heredocs in `packer/scripts/provision.sh`); das Image enthält dieselbe TeX-Live-Auswahl wie die VM.
+- **Image:** `image/Dockerfile` wird von `.github/workflows/image.yml` gebaut (inkl. Smoke-Test:
+  Login, Demo-Projekt öffnen und kompilieren). Nach einer Änderung den neuen Digest in
+  `appstore.yaml` eintragen und eine neue Version taggen.
+- Die Versionen `v1.x` (Terraform/Packer) laufen unverändert weiter.
