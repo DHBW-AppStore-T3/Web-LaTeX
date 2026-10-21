@@ -8,7 +8,7 @@ workload:
   containers:
     - name: editor
       # Built by .github/workflows/image.yml. After changing image/, copy the new digest here.
-      image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:0000000000000000000000000000000000000000000000000000000000000000
+      image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:5906ceeef158b2665a12d6442de44229d99ad623fea9a97727fb5f6afa207590
       expose: { port: 8080, path: /login }
       # An idle editor needs little; pdflatex bursts up to the limits.
       resources: { cpu: "2", memory: 2Gi, requests: { cpu: 100m, memory: 256Mi } }
