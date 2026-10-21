@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Web-LaTeX — Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #1e1e2e; color: #cdd6f4;
+           display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .card { background: #181825; border: 1px solid #313244; border-radius: 10px;
+            padding: 40px; width: 360px; }
+    h1 { color: #cba6f7; font-size: 1.4rem; margin-bottom: 8px; }
+    p  { color: #6c7086; font-size: 0.85rem; margin-bottom: 28px; }
+    label { display: block; font-size: 0.85rem; color: #a6adc8; margin-bottom: 6px; }
+    input { width: 100%; padding: 10px 12px; background: #313244; border: 1px solid #45475a;
+            border-radius: 6px; color: #cdd6f4; font-size: 0.95rem; margin-bottom: 16px; }
+    input:focus { outline: none; border-color: #cba6f7; }
+    button { width: 100%; padding: 11px; background: #cba6f7; color: #1e1e2e;
+             font-weight: 700; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #b4befe; }
+    .error { background: #3b1b1b; color: #f38ba8; border-radius: 6px;
+             padding: 10px 14px; font-size: 0.85rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Web-LaTeX Editor</h1>
+    <p>Bitte melde dich mit deinen Zugangsdaten an.</p>
+    {% if error %}
+    <div class="error">Benutzername oder Passwort falsch.</div>
+    {% endif %}
+    <form method="POST" action="/login">
+      <label for="username">Benutzername</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+      <label for="password">Passwort</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <button type="submit">Anmelden</button>
+    </form>
+  </div>
+</body>
+</html>
