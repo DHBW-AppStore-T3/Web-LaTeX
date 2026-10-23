@@ -1,0 +1,28 @@
+# App contract v2: Web-LaTeX runs as pods, not as VMs (the VM versions, v1.x, are
+# only reachable through their git tags). One editor per person.
+apiVersion: appstore/v2
+name: web-latex
+runtime: kubernetes
+scope: user
+workload:
+  containers:
+    - name: editor
+      # Built by .github/workflows/image.yml. After changing image/, copy the new digest here.
+      image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:5906ceeef158b2665a12d6442de44229d99ad623fea9a97727fb5f6afa207590
+      expose: { port: 8080, path: /login }
+      # An idle editor needs little; pdflatex bursts up to the limits.
+      resources: { cpu: "2", memory: 2Gi, requests: { cpu: 100m, memory: 256Mi } }
+      env:
+        - { name: WEBLATEX_USER, from: user-name }
+        - { name: WEBLATEX_PASSWORD, from: generated-password }
+      writablePaths: [/tmp]
+  # HOME of the container: projects, session key, TeX Live font cache.
+  storage: { size: 2Gi, mountPath: /home/latex }
+egress: none
+variables:
+  # Optional starter project per team (must contain master.tex in the ZIP root);
+  # without it the editor starts with the bundled demo project.
+  - { name: starter, type: file, scope: team, ext: [zip], maxSize: 1Mi, mountPath: /opt/weblatex/starter/starter.zip }
+access:
+  - { type: url, template: "https://{workload}-{deployment}.{domain}" }
+  - { type: password, from: generated-password, username: "{user}" }
