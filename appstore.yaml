@@ -1,5 +1,5 @@
-# App contract v2: Web-LaTeX runs as pods, not as VMs (the terraform/ and packer/
-# directories belong to the VM versions, v1.x). One editor per person.
+# App contract v2: Web-LaTeX runs as pods, not as VMs (the VM versions, v1.x, are
+# only reachable through their git tags). One editor per person.
 apiVersion: appstore/v2
 name: web-latex
 runtime: kubernetes
