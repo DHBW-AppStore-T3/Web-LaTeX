@@ -2,12 +2,16 @@ name: Build image (pod runtime)
 
 # Builds the Web-LaTeX image that appstore.yaml refers to, by digest, and
 # smoke-tests it the way the platform runs it (UID 1000, read-only root, no
-# capabilities). After a build, copy the digest from the job summary into
-# appstore.yaml and tag a new version: the AppStore only deploys images pinned
-# by digest.
+# capabilities). On pull requests the image is only built and tested locally,
+# nothing is pushed. After a build on main or dev, copy the digest from the job
+# summary into appstore.yaml and tag a new version: the AppStore only deploys
+# images pinned by digest.
 on:
   push:
-    branches: [main, dev, 'feat/pod-runtime']
+    branches: [main, dev]
+    paths: ['image/**', '.github/workflows/image.yml']
+  pull_request:
+    branches: [main, dev]
     paths: ['image/**', '.github/workflows/image.yml']
   workflow_dispatch:
 
@@ -25,6 +29,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
+        if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -33,21 +38,25 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: image
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           platforms: linux/amd64
           tags: ${{ env.IMAGE }}:${{ github.sha }}
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
       - name: Digest
+        if: github.event_name != 'pull_request'
         run: |
           echo "### Image digest" >> "$GITHUB_STEP_SUMMARY"
           echo '`${{ env.IMAGE }}@${{ steps.build.outputs.digest }}`' >> "$GITHUB_STEP_SUMMARY"
       - name: Smoke test (platform security context)
+        env:
+          REF: ${{ github.event_name == 'pull_request' && format('{0}:{1}', env.IMAGE, github.sha) || format('{0}@{1}', env.IMAGE, steps.build.outputs.digest) }}
         run: |
           docker run -d --name wl --user 1000:1000 --read-only --cap-drop ALL \
             --security-opt no-new-privileges --network host \
             --tmpfs /tmp --tmpfs /home/latex:uid=1000,gid=1000 \
             -e WEBLATEX_USER=ci-user -e WEBLATEX_PASSWORD=ci-smoke-test \
-            "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}"
+            "$REF"
           for i in $(seq 1 30); do
             curl -fsS -o /dev/null "http://[::1]:8080/login" && ok=1 && break
             sleep 2

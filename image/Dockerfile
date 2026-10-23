@@ -3,7 +3,7 @@
 # (env WEBLATEX_USER / WEBLATEX_PASSWORD).
 FROM docker.io/library/python:3.12.15-slim-bookworm
 
-# Same TeX Live selection as the VM image (packer/scripts/provision.sh).
+# Same TeX Live selection as the former VM image (v1.x).
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       texlive-latex-base \
