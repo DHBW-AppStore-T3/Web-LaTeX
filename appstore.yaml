@@ -9,7 +9,10 @@ workload:
     - name: editor
       # Built by .github/workflows/image.yml. After changing image/, copy the new digest here.
       image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:a94bbc13fc80598a47006b2b61464e94dcf3ae00d4945f23fd704346476134d8
-      expose: { port: 8080, path: /login }
+      # expose.path is the ingress route: only this path and below reach the pod. It must be / because the editor
+      # lives at / (plus /compile, /pdf, ...); with /login only the login page was reachable and the redirect
+      # after login ended in a 404 of the ingress. The app redirects / to /login itself when nobody is logged in.
+      expose: { port: 8080, path: / }
       # An idle editor needs little; pdflatex bursts up to the limits.
       resources: { cpu: "2", memory: 2Gi, requests: { cpu: 100m, memory: 256Mi } }
       env:
