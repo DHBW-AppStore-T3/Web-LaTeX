@@ -1,0 +1,15 @@
+# Checks appstore.yaml against the app contract v2 and that the pinned images can be pulled without credentials.
+# Runs on appstore.yaml changes, e.g. the commit that records a new image digest (that commit does not touch
+# image/, so ci.yml does not run for it).
+name: spec
+on:
+  push:
+    branches: [main, dev]
+    paths: ["appstore.yaml", ".github/workflows/spec.yml"]
+  pull_request:
+    paths: ["appstore.yaml", ".github/workflows/spec.yml"]
+  workflow_dispatch:
+permissions: { contents: read }
+jobs:
+  spec:
+    uses: DHBW-AppStore-T3/app-registry/.github/workflows/validate-spec.yml@v1
