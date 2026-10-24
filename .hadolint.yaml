@@ -1,0 +1,4 @@
+# The image installs TeX Live from the Debian packages of the pinned base image on purpose: the base image's
+# snapshot is the version pin, and apt package versions go out of date with every Debian security update.
+ignored:
+  - DL3008   # pin apt package versions
