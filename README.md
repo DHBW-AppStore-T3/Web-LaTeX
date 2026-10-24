@@ -27,7 +27,7 @@ Die ZIP wird beim ersten Öffnen im persönlichen Workspace entpackt. Ohne ZIP s
 
 ## Image und CI
 
-Die Flask-App und die Templates liegen unter `image/app/`, das Demo-Projekt unter `image/demo/`. `image/Dockerfile` wird von `.github/workflows/image.yml` gebaut und mit dem Sicherheitskontext der Plattform getestet (UID 1000, Read-only-Root, keine Capabilities; Smoke-Test: Login, Demo-Projekt öffnen und kompilieren).
+Die Flask-App und die Templates liegen unter `image/app/`, das Demo-Projekt unter `image/demo/`. `image/Dockerfile` wird von `.github/workflows/ci.yml` gebaut (zentrale Pipeline aus `app-registry`: Vertrag, hadolint, Smoke-Test, Trivy) und mit dem Sicherheitskontext der Plattform getestet (UID 1000, Read-only-Root, keine Capabilities; `.github/smoke-test.sh`: Login, Demo-Projekt öffnen und kompilieren).
 
 - **Pull Request:** das Image wird gebaut und getestet, aber nicht veröffentlicht.
 - **Push auf `main` oder `dev`:** das Image wird zusätzlich nach GHCR gepusht. Den Digest zeigt die Zusammenfassung des Jobs.
