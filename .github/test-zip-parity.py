@@ -22,9 +22,14 @@ import sys
 import zipfile
 import zlib
 
-# safe_zip is part of the image
-sys.path.insert(0, "/opt/weblatex")
-from app.safe_zip import Rejected, unpack  # noqa: E402
+# safe_zip is part of the image; import it directly by file path to avoid
+# conflicts with the 'app' Flask application that is already loaded.
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location("safe_zip", "/opt/weblatex/app/safe_zip.py")
+_mod = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+Rejected = _mod.Rejected
+unpack = _mod.unpack
 
 WORK = "/tmp/zip-parity-test"
 failures = []
