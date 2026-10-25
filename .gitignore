@@ -5,3 +5,7 @@
 Team1/
 Team2/
 *.zip
+
+# Python bytecode
+__pycache__/
+*.pyc

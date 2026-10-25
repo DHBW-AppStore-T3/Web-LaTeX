@@ -1,0 +1,3 @@
+# Keep local build leftovers out of the image
+**/__pycache__
+**/*.pyc
