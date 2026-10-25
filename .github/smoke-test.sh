@@ -34,6 +34,15 @@ curl -fsS -c "$jar" -b "$jar" -o "$pdf" "http://[::1]:8080/pdf"
 # ZIPs), executed in the container as the platform's unprivileged user. The session cookie is Secure in
 # production; the container above runs with WEBLATEX_COOKIE_SECURE=0 because this test speaks plain HTTP.
 docker exec -i wl python3 - < .github/test-hardening.py
-# Shared hostile-archive parity test (.github#13, item 3.3): the same hostile ZIPs that the AppStore
-# backend and Online-IDE reject must also be rejected here.  The script is standalone (no pip needed).
-docker exec -i wl python3 - < .github/test-zip-parity.py
+# Shared hostile-archive parity test (.github#13, item 3.3): the hostile ZIPs of appstore-upload-utils, which
+# the AppStore backend and Online-IDE reject as well, must be rejected by this image's unpacker. The generator is
+# fetched on the runner (not in the container) at a pinned commit and verified by sha256; to take over new
+# vectors bump both values together after reviewing the upstream change.
+UTILS_SHA=f0dc4e01846a34b578b2ea690ba1df484d305c74
+UTILS_SHA256=ed8d5e70399d905af7c55e7aa11d733a149e81404a3daaf8262090487060ecf5
+hostile="$(mktemp)"
+curl -fsSL --retry 3 -o "$hostile" \
+  "https://raw.githubusercontent.com/DHBW-AppStore-T3/appstore-upload-utils/${UTILS_SHA}/src/appstore_upload_utils/hostile_archives.py"
+echo "${UTILS_SHA256}  ${hostile}" | sha256sum -c -
+docker exec -i -e HOSTILE_ARCHIVES_SRC="$(cat "$hostile")" wl python3 - < .github/test-zip-parity.py
+rm -f "$hostile"
