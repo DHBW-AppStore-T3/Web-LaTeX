@@ -8,7 +8,7 @@ workload:
   containers:
     - name: editor
       # Built by .github/workflows/ci.yml. After changing image/, copy the new digest here.
-      image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:a94bbc13fc80598a47006b2b61464e94dcf3ae00d4945f23fd704346476134d8
+      image: ghcr.io/dhbw-appstore-t3/apps/web-latex@sha256:8ff1131016c65df8d897691e191db5c5b8b4545130206e1f9e7f828b24c4e57f
       # expose.path is the ingress route: only this path and below reach the pod. It must be / because the editor
       # lives at / (plus /compile, /pdf, ...); with /login only the login page was reachable and the redirect
       # after login ended in a 404 of the ingress. The app redirects / to /login itself when nobody is logged in.
