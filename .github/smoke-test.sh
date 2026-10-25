@@ -34,3 +34,6 @@ curl -fsS -c "$jar" -b "$jar" -o "$pdf" "http://[::1]:8080/pdf"
 # ZIPs), executed in the container as the platform's unprivileged user. The session cookie is Secure in
 # production; the container above runs with WEBLATEX_COOKIE_SECURE=0 because this test speaks plain HTTP.
 docker exec -i wl python3 - < .github/test-hardening.py
+# Shared hostile-archive parity test (.github#13, item 3.3): the same hostile ZIPs that the AppStore
+# backend and Online-IDE reject must also be rejected here.  The script is standalone (no pip needed).
+docker exec -i wl python3 - < .github/test-zip-parity.py
