@@ -42,7 +42,7 @@ Das Backend prüft Uploads beim Anlegen des Deployments; die App prüft **noch e
 Die Flask-App und die Templates liegen unter `image/app/`, das Demo-Projekt unter `image/demo/`. `image/Dockerfile` wird von `.github/workflows/ci.yml` gebaut (zentrale Pipeline aus `app-registry`: Vertrag, hadolint, Smoke-Test, Trivy) und mit dem Sicherheitskontext der Plattform getestet (UID 1000, Read-only-Root, keine Capabilities; `.github/smoke-test.sh`: Login, Demo-Projekt öffnen und kompilieren).
 
 - **Pull Request:** das Image wird gebaut und getestet, aber nicht veröffentlicht.
-- **Push auf `main` oder `dev`:** das Image wird zusätzlich nach GHCR gepusht. Den Digest zeigt die Zusammenfassung des Jobs.
+- **Push auf `main`:** das Image wird zusätzlich nach GHCR gepusht. Den Digest zeigt die Zusammenfassung des Jobs.
 - Nach einer Änderung den neuen Digest in `appstore.yaml` eintragen und eine neue Version taggen. Die Plattform deployt nur Images, die per Digest festgelegt sind.
 
 ## Ältere Versionen

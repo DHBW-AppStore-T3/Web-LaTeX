@@ -4,7 +4,7 @@
 name: spec
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
     paths: ["appstore.yaml", ".github/workflows/spec.yml"]
   pull_request:
     paths: ["appstore.yaml", ".github/workflows/spec.yml"]

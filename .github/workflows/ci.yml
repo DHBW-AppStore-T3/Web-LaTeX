@@ -1,16 +1,16 @@
 # Pod runtime: builds the image(s) appstore.yaml refers to, by digest, with the central pipeline of
 # DHBW-AppStore-T3/app-registry (validate appstore.yaml, hadolint, build, smoke test, Trivy, push).
-# After a build on main or dev, copy the digest from the job summary into appstore.yaml and tag a new version:
+# After a build on main, copy the digest from the job summary into appstore.yaml and tag a new version:
 # the AppStore only deploys images pinned by digest.
 # Pushes happen only when image/ changes. The weekly run builds and scans without pushing, so new vulnerabilities
 # in the base image show up although the code did not change.
 name: ci
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
     paths: ["image/**", ".github/workflows/ci.yml", ".github/smoke-test.sh", ".github/test-hardening.py", ".github/test-zip-parity.py", ".trivyignore", ".hadolint.yaml"]
   pull_request:
-    branches: [main, dev]
+    branches: [main]
     paths: ["image/**", "appstore.yaml", ".github/workflows/ci.yml", ".github/smoke-test.sh", ".github/test-hardening.py", ".github/test-zip-parity.py", ".trivyignore", ".hadolint.yaml"]
   schedule:
     - cron: "0 5 * * 1"
