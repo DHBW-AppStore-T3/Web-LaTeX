@@ -1,7 +1,7 @@
 # Web-LaTeX editor for the pod runtime (appstore.yaml). One container per person;
 # the platform sets user (UID 1000), a read-only root filesystem and the login
 # (env WEBLATEX_USER / WEBLATEX_PASSWORD).
-FROM docker.io/library/python:3.12.15-slim-bookworm
+FROM docker.io/library/python:3.12.15-slim-trixie
 
 # Same TeX Live selection as the former VM image (v1.x).
 RUN apt-get update \
