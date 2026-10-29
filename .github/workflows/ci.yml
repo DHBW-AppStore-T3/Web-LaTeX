@@ -18,8 +18,8 @@ on:
 permissions: { contents: read, packages: write }
 jobs:
   app:
-    # @v1 is a release tag of app-registry; the pipeline fetches its validator from the same commit.
-    uses: DHBW-AppStore-T3/app-registry/.github/workflows/app-ci.yml@v1
+    # @v1.3.0 is a release tag of app-registry (the first with the network block of appstore.yaml); the pipeline fetches its validator from the same commit.
+    uses: DHBW-AppStore-T3/app-registry/.github/workflows/app-ci.yml@v1.3.0
     with:
       push: ${{ github.event_name != 'schedule' }}
       images: '[{"suffix":"","context":"image","dockerfile":"image/Dockerfile","smoke_test":".github/smoke-test.sh"}]'

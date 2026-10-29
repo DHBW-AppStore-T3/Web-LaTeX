@@ -21,7 +21,12 @@ workload:
       writablePaths: [/tmp]
   # HOME of the container: projects, session key, TeX Live font cache.
   storage: { size: 2Gi, mountPath: /home/latex }
-egress: none
+# What the editor may reach (the contract: app-registry README, "network"). TeX Live is in the image and the editor
+# fetches nothing: no internet, and nobody can switch it on. Students' own TCP/UDP servers and clients between the
+# editors of one deployment: a choice, off by default.
+network:
+  internet: { allowed: false, default: false }
+  podNetwork: { allowed: true, default: false }
 variables:
   # Optional starter project per team (must contain master.tex in the ZIP root);
   # without it the editor starts with the bundled demo project.
