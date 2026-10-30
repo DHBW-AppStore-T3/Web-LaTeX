@@ -4,6 +4,7 @@ apiVersion: appstore/v2
 name: web-latex
 runtime: kubernetes
 scope: user
+scopeChoice: true
 workload:
   containers:
     - name: editor

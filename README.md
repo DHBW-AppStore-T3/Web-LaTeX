@@ -6,6 +6,8 @@ Ein browserbasierter LaTeX-Editor mit vollständiger LaTeX-Umgebung, Syntax-High
 
 Jede Person erhält ihren eigenen Pod und damit einen isolierten Workspace mit eigenem Projektverzeichnis. Projekte und Einstellungen liegen im persistenten Home-Verzeichnis und überstehen Pause/Fortsetzen und Neustart.
 
+Standard ist ein Pod je Person (`scope: user`). Mit `scopeChoice: true` kann die Lehrperson im Wizard unter „Experteneinstellungen“ stattdessen einen Pod je Gruppe wählen; die Mitglieder einer Gruppe teilen sich dann Pod, Speicher und Passwort.
+
 - **Login:** Benutzername und Passwort stehen unter „Meine Zugänge“ (der Benutzername ist der Plattform-Benutzername).
 
 ## Konfigurierbare Variablen
